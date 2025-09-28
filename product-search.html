@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>🔎 الحاسبة الذكية للرسم كمرك العراق</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button onclick="toggleTheme()" style="position:fixed;top:10px;left:10px;">🌓</button>
+<div class="card">
+  <h1>📦 الحاسبة الذكية</h1>
+  <label>🔎 ابحث بالاسم أو IDE</label><input id="q">
+  <label>⚖️ الوزن الكلي (كغ)</label><input id="w" type="number">
+  <label>💵 الرسم المدفوع بإبراهيم خليل (USD)</label><input id="paid" type="number">
+  <label>💰 القيمة الكلية للحمل (USD)</label><input id="total" type="number">
+  <label>📊 قيمة الإيراد (GDS_YER)</label><input id="yer" type="number">
+  <label>🔢 سعر الصرف (دينار/دولار)</label><input id="ex" type="number" value="1320">
+  <label>🏷️ النسبة (%)</label><input id="rt" type="number" value="6" step="0.01">
+  <button onclick="calc()">احسب</button>
+  <div id="out" class="result ok" style="display:none"></div>
+</div>
+<script>
+let DB=[],current=null;const $=s=>document.querySelector(s);
+const fmt=x=>{const n=Number(x);return isFinite(n)?n.toLocaleString('ar-IQ',{maximumFractionDigits:3}):'-';};
+function calc(){const w=parseFloat($("#w").value)||0,paid=parseFloat($("#paid").value)||0,yer=parseFloat($("#yer").value)||0,ex=parseFloat($("#ex").value)||1320,rt=parseFloat($("#rt").value)||6;if(!(w>0)||!(yer>0)){alert("⚠️ أدخل الوزن وقيمة GDS_YER");return;}const A=w*yer*(rt/100);const B=paid;const AB=(A-B)*ex;$("#out").style.display="";$("#out").innerHTML=`<div>🏷️ المنتج: ${current?current.product:($("#q").value||"-")}</div><div>🔢 IDE: ${current?(current.IDE||"-"):"-"}</div><div>⚖️ الوزن الكلي: ${fmt(w)} كغ</div><div>💰 قيمة GDS_YER: ${fmt(yer)} USD/طن</div><div>🏷️ النسبة: ${rt}%</div><div>💵 الرسم بإبراهيم خليل: ${fmt(B)} USD</div><div><b>✅💳 الرسم النهائي: ${fmt(AB)} دينار</b></div>`;}
+(async()=>{try{const res=await fetch("products.json");DB=await res.json();}catch{}const p=new URLSearchParams(location.search);const q=p.get("name")||p.get("ide");if(q){$("#q").value=q;current=DB.find(r=>r.product==q||r.IDE==q)||null;if(current&&current.GDS_YER)$("#yer").value=current.GDS_YER;}})();
+function toggleTheme(){document.body.classList.toggle("light");}
+</script>
+</body>
+</html>

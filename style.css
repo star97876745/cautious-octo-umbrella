@@ -1,0 +1,18 @@
+/* الوضع الافتراضي: داكن */
+:root{--bg:#0f172a;--text:#e5e7eb;--card-bg:#111827;--accent:#2563eb;--accent-hover:#3b82f6;--table-header:#1e293b;--table-row-alt:#111827;--success-bg:#064e3b;--success-text:#d1fae5;}
+.light{--bg:#f8fafc;--text:#111827;--card-bg:#ffffff;--accent:#1d4ed8;--accent-hover:#2563eb;--table-header:#e2e8f0;--table-row-alt:#f1f5f9;--success-bg:#d1fae5;--success-text:#065f46;}
+body{font-family:"Segoe UI","Noto Naskh Arabic",sans-serif;background:var(--bg);color:var(--text);margin:0;padding:20px;transition:background .3s,color .3s;}
+h1{text-align:center;color:var(--accent);margin-top:0;}
+input{width:100%;padding:10px;margin:10px 0;border-radius:8px;border:1px solid #cbd5e1;background:var(--card-bg);color:var(--text);transition:background .3s,color .3s;}
+button{padding:10px 16px;border:none;border-radius:8px;background:var(--accent);color:white;cursor:pointer;font-size:15px;transition:background .3s;}
+button:hover{background:var(--accent-hover);}
+table{width:100%;border-collapse:collapse;margin-top:10px;}
+th,td{padding:10px;border-bottom:1px solid #cbd5e1;text-align:center;}
+th{background:var(--table-header);color:var(--accent);}
+tr:nth-child(even){background:var(--table-row-alt);}
+a{color:var(--accent);text-decoration:none;}
+a:hover{text-decoration:underline;}
+.card{background:var(--card-bg);padding:20px;border-radius:14px;max-width:480px;margin:auto;box-shadow:0 4px 10px rgba(0,0,0,.1);transition:background .3s,color .3s;}
+.result{margin-top:12px;padding:12px;border-radius:10px;background:#0b1220;}
+.light .result{background:#f1f5f9;}
+.ok{background:var(--success-bg);color:var(--success-text);}

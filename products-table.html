@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>📊 جدول المنتجات</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button onclick="toggleTheme()" style="position:fixed;top:10px;left:10px;">🌓</button>
+<h1>📊 جدول المنتجات</h1>
+<input id="q" placeholder="ابحث باسم المنتج أو IDE ..." oninput="filter()">
+<table>
+  <thead><tr><th>المنتج</th><th>IDE</th><th>GDS_YER</th></tr></thead>
+  <tbody id="tb"></tbody>
+</table>
+<script>
+let DB=[],VIEW=[];const $=s=>document.querySelector(s);
+function render(){const tb=$("#tb");tb.innerHTML="";VIEW.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td><a href="product-search.html?name=${encodeURIComponent(r.product)}">${r.product}</a></td><td>${r.IDE||"-"}</td><td>${r.GDS_YER}</td>`;tb.appendChild(tr);});}
+function filter(){const q=$("#q").value.toLowerCase();VIEW=DB.filter(r=>r.product.toLowerCase().includes(q)||(r.IDE||"").toLowerCase().includes(q));render();}
+fetch("products.json").then(r=>r.json()).then(js=>{DB=js;VIEW=DB;render();});
+function toggleTheme(){document.body.classList.toggle("light");}
+</script>
+</body>
+</html>
