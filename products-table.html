@@ -1,22 +1,77 @@
-<!doctype html>
 <html lang="ar" dir="rtl">
-<head><meta charset="utf-8"><title>📊 جدول + حاسبة مع زر IDE</title></head>
+<head>
+<meta charset="utf-8">
+<title>📊 جدول + حاسبة مع زر IDE</title>
+<style>
+  table { border-collapse: collapse; width: 100%; }
+  th, td { padding: 8px; border: 1px solid #ccc; text-align: center; }
+  tr:nth-child(even){background:#2563eb}
+  th { cursor: pointer; background:#2563eb; }
+  #modal {
+    display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.5); align-items:center; justify-content:center;
+  }
+  #modal .box {
+    background:#e5e7; padding:20px; border-radius:8px; min-width:300px;
+  }
+</style>
+</head>
 <body>
 <h1>📊 جدول المنتجات</h1>
 <input id="q" placeholder="ابحث باسم أو IDE ..." oninput="filter()">
-<table border="1"><thead><tr><th>المنتج</th><th>IDE</th><th>GDS_MIN</th><th>GDS_MAX</th><th>GDS_YER</th></tr></thead><tbody id="tb"></tbody></table>
-<hr>
-<div id="calc" style="display:none">
-<h2>🔎 الحاسبة</h2>
-<div id="prod"></div>
-<label>وزن (كغ): <input id="w" type="number"></label><br>
-<label>سعر الصرف: <input id="ex" type="number" value="1320"></label><br>
-<label>النسبة %: <input id="rt" type="number" value="6"></label><br>
-<button onclick="calc()">احسب</button>
-<div id="out"></div>
+<table>
+  <style>
+    :root{--bg:#0f172a;--text:#e5e7eb;--card-bg:#111827;--accent:#2563eb;--accent-hover:#3b82f6;--table-header:#1e293b;--table-row-alt:#111827;--success-bg:#064e3b;--success-text:#d1fae5;}
+.light{--bg:#f8fafc;--text:#111827;--card-bg:#ffffff;--accent:#1d4ed8;--accent-hover:#2563eb;--table-header:#e2e8f0;--table-row-alt:#f1f5f9;--success-bg:#d1fae5;--success-text:#065f46;}
+body{font-family:"Segoe UI","Noto Naskh Arabic",sans-serif;background:var(--bg);color:var(--text);margin:0;padding:20px;transition:background .3s,color .3s;}
+h1{text-align:center;color:var(--accent);margin-top:0;}
+input{width:100%;padding:10px;margin:10px 0;border-radius:8px;border:1px solid #cbd5e1;background:var(--card-bg);color:var(--text);transition:background .3s,color .3s;}
+button{padding:10px 16px;border:none;border-radius:8px;background:var(--accent);color:white;cursor:pointer;font-size:15px;transition:background .3s;}
+button:hover{background:var(--accent-hover);}
+table{width:100%;border-collapse:collapse;margin-top:10px;}
+th,td{padding:10px;border-bottom:1px solid #cbd5e1;text-align:center;}
+th{background:var(--table-header);color:var(--accent);}
+tr:nth-child(even){background:var(--table-row-alt);}
+a{color:var(--accent);text-decoration:none;}
+a:hover{text-decoration:underline;}
+.card{background:var(--card-bg);padding:20px;border-radius:14px;max-width:480px;margin:auto;box-shadow:0 4px 10px rgba(0,0,0,.1);transition:background .3s,color .3s;}
+.result{margin-top:12px;padding:12px;border-radius:10px;background:#0b1220;}
+.light .result{background:#f1f5f9;}
+.ok{background:var(--success-bg);color:var(--success-text);}
+  </style>
+  <thead>
+    <tr>
+      <th onclick="sortBy('product')">المنتج</th>
+      <th onclick="sortBy('IDE')">IDE</th>
+      <th onclick="sortBy('GDS_MIN')">GDS_MIN</th>
+      <th onclick="sortBy('GDS_MAX')">GDS_MAX</th>
+      <th onclick="sortBy('GDS_YER')">GDS_YER</th>
+    </tr>
+  </thead>
+  <tbody id="tb"></tbody>
+</table>
+
+<!-- Modal -->
+<div id="modal">
+  <div class="box">
+    <h2>🔎 الحاسبة</h2>
+    <div id="prod"></div>
+    <label>وزن (كغ): <input id="w" type="number"></label><br>
+    <label>سعر الصرف: <input id="ex" type="number" value="1320"></label><br>
+    <label>النسبة %: <input id="rt" type="number" value="6"></label><br><br>
+    <button onclick="calc()">احسب</button>
+    <button onclick="closeModal()">إغلاق</button>
+    <div id="out"></div>
+  </div>
 </div>
+
 <script>
-let DB=[],VIEW=[],cur=null;
+
+
+
+
+
+let DB=[],VIEW=[],cur=null,sortAsc=true;
 const $=s=>document.querySelector(s);
 function fmt(x){const n=Number(x);return isFinite(n)?n.toLocaleString('ar-IQ',{maximumFractionDigits:2}):'-';}
 function prep(arr){return arr.map(r=>({product:r.product||r.GDS_DS2,IDE:r.IDE_HSC_NB1||r.IDE,GDS_MIN:+r.GDS_MIN,GDS_MAX:+r.GDS_MAX,GDS_YER:r.GDS_YER?+r.GDS_YER:(+r.GDS_MIN+ +r.GDS_MAX)/2})).filter(r=>r.product);}
@@ -24,10 +79,12 @@ function render(){const tb=$("#tb");tb.innerHTML="";VIEW.forEach(r=>{const tr=do
 <td>${r.product} <button onclick="openIDE('${r.IDE||''}')">🔗 IDE</button> <a href='#' onclick='openCalc(${JSON.stringify(r)})'>حاسبة</a></td>
 <td>${r.IDE||"-"}</td><td>${fmt(r.GDS_MIN)}</td><td>${fmt(r.GDS_MAX)}</td><td>${fmt(r.GDS_YER)}</td>`;tb.appendChild(tr);});}
 function filter(){const q=$("#q").value.toLowerCase();VIEW=DB.filter(r=>r.product.toLowerCase().includes(q)||(r.IDE||'').toLowerCase().includes(q));render();}
-function openCalc(r){cur=r;$("#calc").style.display="block";$("#prod").innerHTML=`<b>${r.product}</b> (IDE:${r.IDE||"-"}) YER=${fmt(r.GDS_YER)}`;}
-function calc(){if(!cur)return;const w=+$("#w").value,ex=+$("#ex").value,rt=+$("#rt").value;const d=w*cur.GDS_YER*ex*(rt/100);$("#out").innerHTML=`فرق الرسم: <b>${fmt(d)}</b> دينار`;}
+function openCalc(r){cur=r;$("#prod").innerHTML=`<b>${r.product}</b> (IDE:${r.IDE||"-"}) YER=${fmt(r.GDS_YER)}`;$("#modal").style.display="flex";}
+function calc(){if(!cur)return;const w=+$("#w").value,ex=+$("#ex").value,rt=+$("#rt").value;if(w<=0||ex<=0){$("#out").innerHTML="⚠️ تحقق من المدخلات";return;}const d=w*cur.GDS_YER*ex*(rt/100);$("#out").innerHTML=`فرق الرسم: <b>${fmt(d)}</b> دينار`;}
 function openIDE(ide){if(!ide){alert("ماكو IDE");return;}window.open("product-search.html?ide="+encodeURIComponent(ide),"_blank");}
-fetch('products.json').then(r=>r.json()).then(js=>{DB=prep(js);VIEW=DB;render();});
+function closeModal(){$("#modal").style.display="none";}
+function sortBy(key){VIEW.sort((a,b)=>sortAsc?(a[key]>b[key]?1:-1):(a[key]<b[key]?1:-1));sortAsc=!sortAsc;render();}
+fetch('products.json').then(r=>r.json()).then(js=>{DB=prep(js);VIEW=DB;render();$("#q").focus();});
 </script>
 </body>
 </html>
