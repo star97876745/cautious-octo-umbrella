@@ -1,14 +1,43 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
-<head><meta charset="utf-8"><title>📦 الكمارك العراقية</title></head>
-<li><a href="products-table.html">📊 جدول المنتجات</a></li>
-<li><a href="product-search.html">🔎 الحاسبة</a></li>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href="style.css">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>الصفحة الرئيسية — موقعك</title>
+  <link rel="stylesheet" href="/css/global.css" />
 </head>
 <body>
-<button onclick="toggleTheme()" style="position:fixed;top:10px;left:10px;">🌓</button>
-<script>
-function toggleTheme(){document.body.classList.toggle("light");}
-</script>
+  <!-- Header -->
+  <header class="site-header" role="banner" aria-label="رأس الموقع">
+    <div class="container">
+      <a href="/" class="brand" aria-label="الصفحة الرئيسية">اسم الموقع</a>
+      <nav class="nav" role="navigation" aria-label="قائمة التنقل">
+        <a href="/index.html">الرئيسية</a>
+        <a href="/about.html">عن الموقع</a>
+        <a href="/contact.html">اتصل بنا</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main container" role="main">
+    <section class="card">
+      <h1 class="h1">مرحباً بك في موقعك</h1>
+      <p class="text-muted">تمت إضافة تنسيق مركزي وقوالب رأس وتذييل. عدِّل المحتوى هنا حسب حاجتك.</p>
+      <a class="btn" href="#">ابدأ الآن</a>
+    </section>
+
+    <aside class="card" style="margin-top:1rem;">
+      <h2 class="h1">آخر الأخبار</h2>
+      <p class="text-muted">أضف تحديثات أو روابط سريعة هنا.</p>
+    </aside>
+  </main>
+
+  <footer class="site-footer" role="contentinfo" aria-label="تذييل الموقع">
+    <div class="container">
+      <div class="center">
+        <p class="text-muted">© 2025 اسم الموقع — جميع الحقوق محفوظة</p>
+      </div>
+    </div>
+  </footer>
 </body>
+</html>
