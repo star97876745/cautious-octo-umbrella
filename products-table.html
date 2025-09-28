@@ -1,25 +1,34 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
-<head>
-<meta charset="utf-8">
-<title>📊 جدول المنتجات</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href="style.css">
-</head>
+<head><meta charset="utf-8"><title>📊 جدول + حاسبة مع زر IDE</title></head>
 <body>
-<button onclick="toggleTheme()" style="position:fixed;top:10px;left:10px;">🌓</button>
 <h1>📊 جدول المنتجات</h1>
-<input id="q" placeholder="ابحث باسم المنتج أو IDE ..." oninput="filter()">
-<table>
-  <thead><tr><th>المنتج</th><th>IDE</th><th>GDS_YER</th></tr></thead>
-  <tbody id="tb"></tbody>
-</table>
+<input id="q" placeholder="ابحث باسم أو IDE ..." oninput="filter()">
+<table border="1"><thead><tr><th>المنتج</th><th>IDE</th><th>GDS_MIN</th><th>GDS_MAX</th><th>GDS_YER</th></tr></thead><tbody id="tb"></tbody></table>
+<hr>
+<div id="calc" style="display:none">
+<h2>🔎 الحاسبة</h2>
+<div id="prod"></div>
+<label>وزن (كغ): <input id="w" type="number"></label><br>
+<label>سعر الصرف: <input id="ex" type="number" value="1320"></label><br>
+<label>النسبة %: <input id="rt" type="number" value="6"></label><br>
+<button onclick="calc()">احسب</button>
+<div id="out"></div>
+</div>
 <script>
-let DB=[],VIEW=[];const $=s=>document.querySelector(s);
-function render(){const tb=$("#tb");tb.innerHTML="";VIEW.forEach(r=>{const tr=document.createElement("tr");tr.innerHTML=`<td><a href="product-search.html?name=${encodeURIComponent(r.product)}">${r.product}</a></td><td>${r.IDE||"-"}</td><td>${r.GDS_YER}</td>`;tb.appendChild(tr);});}
-function filter(){const q=$("#q").value.toLowerCase();VIEW=DB.filter(r=>r.product.toLowerCase().includes(q)||(r.IDE||"").toLowerCase().includes(q));render();}
-fetch("products.json").then(r=>r.json()).then(js=>{DB=js;VIEW=DB;render();});
-function toggleTheme(){document.body.classList.toggle("light");}
+let DB=[],VIEW=[],cur=null;
+const $=s=>document.querySelector(s);
+function fmt(x){const n=Number(x);return isFinite(n)?n.toLocaleString('ar-IQ',{maximumFractionDigits:2}):'-';}
+function prep(arr){return arr.map(r=>({product:r.product||r.GDS_DS2,IDE:r.IDE_HSC_NB1||r.IDE,GDS_MIN:+r.GDS_MIN,GDS_MAX:+r.GDS_MAX,GDS_YER:r.GDS_YER?+r.GDS_YER:(+r.GDS_MIN+ +r.GDS_MAX)/2})).filter(r=>r.product);}
+function render(){const tb=$("#tb");tb.innerHTML="";VIEW.forEach(r=>{const tr=document.createElement('tr');tr.innerHTML=`
+<td>${r.product} <button onclick="openIDE('${r.IDE||''}')">🔗 IDE</button> <a href='#' onclick='openCalc(${JSON.stringify(r)})'>حاسبة</a></td>
+<td>${r.IDE||"-"}</td><td>${fmt(r.GDS_MIN)}</td><td>${fmt(r.GDS_MAX)}</td><td>${fmt(r.GDS_YER)}</td>`;tb.appendChild(tr);});}
+function filter(){const q=$("#q").value.toLowerCase();VIEW=DB.filter(r=>r.product.toLowerCase().includes(q)||(r.IDE||'').toLowerCase().includes(q));render();}
+function openCalc(r){cur=r;$("#calc").style.display="block";$("#prod").innerHTML=`<b>${r.product}</b> (IDE:${r.IDE||"-"}) YER=${fmt(r.GDS_YER)}`;}
+function calc(){if(!cur)return;const w=+$("#w").value,ex=+$("#ex").value,rt=+$("#rt").value;const d=w*cur.GDS_YER*ex*(rt/100);$("#out").innerHTML=`فرق الرسم: <b>${fmt(d)}</b> دينار`;}
+function openIDE(ide){if(!ide){alert("ماكو IDE");return;}window.open("product-search.html?ide="+encodeURIComponent(ide),"_blank");}
+fetch('products.json').then(r=>r.json()).then(js=>{DB=prep(js);VIEW=DB;render();});
 </script>
 </body>
 </html>
+<
